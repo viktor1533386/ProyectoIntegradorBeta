@@ -11,6 +11,18 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+register_shutdown_function(function() {
+    $error = error_get_last();
+    if ($error && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR])) {
+        http_response_code(500);
+        echo "<div style='padding:20px;background:#f8d7da;color:#721c24;font-family:sans-serif;'>";
+        echo "<h2>FATAL ERROR CAUGHT:</h2>";
+        echo "<b>" . htmlspecialchars($error['message']) . "</b><br>";
+        echo "File: " . $error['file'] . " (Line " . $error['line'] . ")";
+        echo "</div>";
+    }
+});
+
 // Soporte para Nginx (Railway) donde mod_rewrite no inyecta $_GET['url']
 if (!isset($_GET['url'])) {
     $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
