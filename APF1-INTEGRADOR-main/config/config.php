@@ -13,7 +13,17 @@ if ($is_localhost) {
     $protocol = isset($_SERVER['HTTP_X_FORWARDED_PROTO']) ? $_SERVER['HTTP_X_FORWARDED_PROTO'] : (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http");
     $default_url = $protocol . '://' . $host;
 }
-define('BASE_URL', getenv('BASE_URL') !== false && getenv('BASE_URL') !== '' ? getenv('BASE_URL') : $default_url);
+
+$env_base_url = getenv('BASE_URL');
+if ($env_base_url) {
+    $env_base_url = rtrim($env_base_url, '/');
+    if (substr($env_base_url, -7) === '/public') {
+        $env_base_url = substr($env_base_url, 0, -7);
+    }
+    define('BASE_URL', $env_base_url);
+} else {
+    define('BASE_URL', $default_url);
+}
 
 // --- RUTAS ABSOLUTAS ---
 define('APP_ROOT', dirname(__DIR__));
