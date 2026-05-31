@@ -5,8 +5,15 @@
 
 // --- BASE URL ---
 // Cambia 'APF1-INTEGRADOR' si renombras la carpeta en htdocs
-$default_url = 'http://localhost/APF1-INTEGRADOR/public';
-define('BASE_URL', getenv('BASE_URL') !== false ? getenv('BASE_URL') : $default_url);
+$is_localhost = isset($_SERVER['HTTP_HOST']) && strpos($_SERVER['HTTP_HOST'], 'localhost') !== false;
+if ($is_localhost) {
+    $default_url = 'http://localhost/APF1-INTEGRADOR/public';
+} else {
+    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    $protocol = isset($_SERVER['HTTP_X_FORWARDED_PROTO']) ? $_SERVER['HTTP_X_FORWARDED_PROTO'] : (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http");
+    $default_url = $protocol . '://' . $host;
+}
+define('BASE_URL', getenv('BASE_URL') !== false && getenv('BASE_URL') !== '' ? getenv('BASE_URL') : $default_url);
 
 // --- RUTAS ABSOLUTAS ---
 define('APP_ROOT', dirname(__DIR__));
