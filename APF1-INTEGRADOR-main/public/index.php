@@ -6,6 +6,17 @@
 
 session_start();
 
+// Soporte para Nginx (Railway) donde mod_rewrite no inyecta $_GET['url']
+if (!isset($_GET['url'])) {
+    $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+    // Remover BASE_URL base si existe (ej. para subcarpetas en local)
+    $script_dir = dirname($_SERVER['SCRIPT_NAME']); // ej. /APF1-INTEGRADOR/public
+    if ($script_dir !== '/' && strpos($uri, $script_dir) === 0) {
+        $uri = substr($uri, strlen($script_dir));
+    }
+    $_GET['url'] = ltrim($uri, '/');
+}
+
 // Cargar configuración
 require_once dirname(__DIR__) . '/config/config.php';
 
