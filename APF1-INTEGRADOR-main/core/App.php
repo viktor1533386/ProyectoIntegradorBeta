@@ -67,7 +67,9 @@ class App {
         echo '<div style="font-family:sans-serif;text-align:center;padding:4rem">
             <h1 style="font-size:4rem;color:#111111">404</h1>
             <p style="font-size:1.2rem;color:#666">Página no encontrada</p>
-            <a href="' . BASE_URL . '" style="color:#FACC15">← Volver al inicio</a>
+            <p style="color:red">DEBUG URL: ' . htmlspecialchars($_GET['url'] ?? 'NULL') . '</p>
+            <a href="' . BASE_URL . '/" style="color:#FACC15">← Volver al inicio</a>
             </div>';
+        echo str_repeat(' ', 1024); // Pad to bypass Chrome's friendly 404
     }
 }
