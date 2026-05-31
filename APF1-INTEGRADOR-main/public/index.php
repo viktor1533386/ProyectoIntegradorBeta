@@ -1,29 +1,37 @@
 <?php
+// Habilitar reporte de errores temporalmente para depuración
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+function renderFatalError($message, $file, $line) {
+    http_response_code(200); // Bypassear Chrome 500
+    echo "<div style='padding:20px;background:#f8d7da;color:#721c24;font-family:sans-serif;'>";
+    echo "<h2>FATAL ERROR CAUGHT:</h2>";
+    echo "<b>" . htmlspecialchars($message) . "</b><br>";
+    echo "File: " . $file . " (Line " . $line . ")";
+    echo "</div>";
+    echo str_repeat(' ', 1024);
+    exit;
+}
+
+set_exception_handler(function($e) {
+    renderFatalError($e->getMessage(), $e->getFile(), $e->getLine());
+});
+
+register_shutdown_function(function() {
+    $error = error_get_last();
+    if ($error && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR])) {
+        renderFatalError($error['message'], $error['file'], $error['line']);
+    }
+});
+
 // ============================================================
 //  PUBLIC/INDEX.PHP – Entry point del Framework MVC
 //  Toda petición HTTP pasa por aquí gracias al .htaccess
 // ============================================================
 
 session_start();
-
-// Habilitar reporte de errores temporalmente para depuración
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
-register_shutdown_function(function() {
-    $error = error_get_last();
-    if ($error && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR])) {
-        http_response_code(200); // Enviar 200 para que Chrome no oculte el error
-        echo "<div style='padding:20px;background:#f8d7da;color:#721c24;font-family:sans-serif;'>";
-        echo "<h2>FATAL ERROR CAUGHT:</h2>";
-        echo "<b>" . htmlspecialchars($error['message']) . "</b><br>";
-        echo "File: " . $error['file'] . " (Line " . $error['line'] . ")";
-        echo "</div>";
-        // Relleno para asegurar que navegadores muestren el contenido
-        echo str_repeat(' ', 1024);
-    }
-});
 
 // Soporte para Nginx (Railway) donde mod_rewrite no inyecta $_GET['url']
 if (!isset($_GET['url'])) {
