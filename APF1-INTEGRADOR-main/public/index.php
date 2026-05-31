@@ -6,6 +6,11 @@
 
 session_start();
 
+// Habilitar reporte de errores temporalmente para depuración
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 // Soporte para Nginx (Railway) donde mod_rewrite no inyecta $_GET['url']
 if (!isset($_GET['url'])) {
     $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
