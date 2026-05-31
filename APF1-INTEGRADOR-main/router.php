@@ -10,8 +10,23 @@ if ($path === '/') {
 }
 
 // Si el archivo existe físicamente en el directorio public (ej. CSS, JS, imágenes), servirlo tal cual
-if (file_exists(__DIR__ . '/public' . $path) && is_file(__DIR__ . '/public' . $path)) {
-    return false;
+$file = __DIR__ . '/public' . $path;
+if (file_exists($file) && is_file($file)) {
+    $ext = pathinfo($file, PATHINFO_EXTENSION);
+    $mimeTypes = [
+        'css' => 'text/css',
+        'js'  => 'application/javascript',
+        'png' => 'image/png',
+        'jpg' => 'image/jpeg',
+        'jpeg'=> 'image/jpeg',
+        'gif' => 'image/gif',
+        'svg' => 'image/svg+xml'
+    ];
+    if (array_key_exists($ext, $mimeTypes)) {
+        header("Content-Type: " . $mimeTypes[$ext]);
+    }
+    readfile($file);
+    return;
 }
 
 // Emular el comportamiento de mod_rewrite de Apache (.htaccess)
